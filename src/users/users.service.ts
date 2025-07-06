@@ -6,7 +6,7 @@ import {
 import { InjectModel } from "@nestjs/sequelize";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
-import { User } from "./models/user.model";
+import { User, UserRole } from "./models/user.model";
 import { Op } from "sequelize";
 
 @Injectable()
@@ -29,12 +29,33 @@ export class UsersService {
     return this.userModel.create(createUserDto);
   }
 
+  async createAdmin(createUserDto: CreateUserDto): Promise<User> {
+    const { email, phone } = createUserDto;
+
+    const existingUser = await this.userModel.findOne({
+      where: {
+        [Op.or]: [{ email }, { phone }],
+      },
+    });
+
+    if (existingUser) {
+      throw new BadRequestException("Bunday foydalanuvchi allaqachon mavjud");
+    }
+
+    const newAdmin = await this.userModel.create({
+      ...createUserDto,
+      role: UserRole.ADMIN,
+    });
+
+    return newAdmin;
+  }
+
   async findAll(): Promise<User[]> {
     return this.userModel.findAll({ include: { all: true } });
   }
 
   async findOne(id: number): Promise<User> {
-    const user = await this.userModel.findByPk(id,{include:{all:true}});
+    const user = await this.userModel.findByPk(id, { include: { all: true } });
     if (!user) {
       throw new NotFoundException("Foydalanuvchi topilmadi");
     }

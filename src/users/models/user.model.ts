@@ -56,6 +56,9 @@ export class User extends Model<User, IUserCreationAttr> {
   })
   declare email: string;
 
+  @Column({ type: DataType.BOOLEAN, defaultValue: false })
+  declare isCreator: boolean;
+
   @ApiProperty({
     example: "P@ssw0rd!",
     description: "Foydalanuvchining paroli (hashlangan bo'lishi kerak)",

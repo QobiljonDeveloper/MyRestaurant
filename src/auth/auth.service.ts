@@ -14,6 +14,7 @@ import * as bcrypt from "bcrypt";
 import { Response } from "express";
 import { v4 as uuidv4 } from "uuid";
 import { MailService } from "../mail/mail.service";
+import { UserRole } from "../users/models/user.model";
 
 @Injectable()
 export class AuthService {
@@ -29,6 +30,7 @@ export class AuthService {
       role: user.role,
       email: user.email,
       is_active: user.is_active,
+      is_creator: user.isCreator,
     };
 
     const [accessToken, refreshToken] = await Promise.all([
@@ -50,6 +52,11 @@ export class AuthService {
       throw new BadRequestException("Parollar mos emas");
     }
 
+    // ROLE ADMIN BO'LSA RO'YXATDAN O'TISHNI TAQIQLASH
+    if (dto.role && dto.role.toLowerCase() === "admin") {
+      throw new ForbiddenException("Admin sifatida ro'yxatdan o'tib bo'lmaydi");
+    }
+
     const existing = await this.usersService.findUserByEmail(dto.email);
     if (existing) {
       throw new ConflictException("Bu email allaqachon ro‘yxatdan o‘tgan");
@@ -62,6 +69,7 @@ export class AuthService {
       ...dto,
       password: hash,
       activation_link,
+      role: UserRole.CUSTOMER,
     });
 
     await this.mailService.sendMail(user);

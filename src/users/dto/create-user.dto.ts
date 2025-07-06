@@ -3,6 +3,7 @@ import {
   IsEmail,
   IsEnum,
   IsNotEmpty,
+  IsOptional,
   IsPhoneNumber,
   IsString,
   Matches,
@@ -48,4 +49,12 @@ export class CreateUserDto {
   activation_link: boolean;
   @IsEnum(UserRole)
   role: UserRole;
+
+  @ApiProperty({
+    example: false,
+    description: "Foydalanuvchi creator ekanligi",
+    required: false,
+  })
+  @IsOptional()
+  isCreator?: boolean;
 }
