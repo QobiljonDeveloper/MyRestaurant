@@ -24,6 +24,16 @@ import { RestaurantImagesModule } from "./restaurant-images/restaurant-images.mo
 import { RestaurantImage } from "./restaurant-images/models/restaurant-image.model";
 import { ReviewsModule } from "./reviews/reviews.module";
 import { Review } from "./reviews/models/review.model";
+import { ReservationModule } from "./reservation/reservation.module";
+import { Reservation } from "./reservation/models/reservation.model";
+import { FavoritesModule } from "./favorites/favorites.module";
+import { Favorite } from "./favorites/models/favorite.model";
+import { AnnouncementsModule } from "./announcements/announcements.module";
+import { Announcement } from "./announcements/models/announcement.model";
+import { PaymentsModule } from "./payments/payments.module";
+import { Payment } from "./payments/models/payment.model";
+import { OpeningSchedulesModule } from "./opening-schedules/opening-schedules.module";
+import { OpeningSchedule } from "./opening-schedules/models/opening-schedule.model";
 
 @Module({
   imports: [
@@ -57,6 +67,11 @@ import { Review } from "./reviews/models/review.model";
         MenuCategory,
         RestaurantImage,
         Review,
+        Reservation,
+        Favorite,
+        Announcement,
+        Payment,
+        OpeningSchedule,
       ],
       autoLoadModels: true,
       logging: false,
@@ -73,6 +88,11 @@ import { Review } from "./reviews/models/review.model";
     MenuCategoriesModule,
     RestaurantImagesModule,
     ReviewsModule,
+    ReservationModule,
+    FavoritesModule,
+    AnnouncementsModule,
+    PaymentsModule,
+    OpeningSchedulesModule,
   ],
   controllers: [],
   providers: [],

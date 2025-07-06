@@ -2,6 +2,9 @@ import { Column, DataType, HasMany, Model, Table } from "sequelize-typescript";
 import { ApiProperty } from "@nestjs/swagger";
 import { Restaurant } from "../../restaurants/models/restaurant.model";
 import { Review } from "../../reviews/models/review.model";
+import { Reservation } from "../../reservation/models/reservation.model";
+import { Favorite } from "../../favorites/models/favorite.model";
+import { Payment } from "../../payments/models/payment.model";
 
 export enum UserRole {
   ADMIN = "admin",
@@ -116,4 +119,13 @@ export class User extends Model<User, IUserCreationAttr> {
 
   @HasMany(() => Review)
   review: Review[];
+
+  @HasMany(() => Reservation)
+  reservation: Reservation[];
+
+  @HasMany(() => Favorite)
+  favorite: Favorite[];
+
+  @HasMany(() => Payment)
+  payment: Payment[];
 }

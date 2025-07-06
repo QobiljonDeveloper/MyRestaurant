@@ -13,7 +13,7 @@ import { CreateReviewDto } from "./dto/create-review.dto";
 import { UpdateReviewDto } from "./dto/update-review.dto";
 import { Review } from "./models/review.model";
 
-@ApiTags("Sharhlar")
+@ApiTags("Reviews")
 @Controller("reviews")
 export class ReviewsController {
   constructor(private readonly reviewsService: ReviewsService) {}

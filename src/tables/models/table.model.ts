@@ -5,9 +5,11 @@ import {
   Table as SequelizeTable,
   ForeignKey,
   BelongsTo,
+  HasMany,
 } from "sequelize-typescript";
 import { ApiProperty } from "@nestjs/swagger";
 import { Restaurant } from "../../restaurants/models/restaurant.model";
+import { Reservation } from "../../reservation/models/reservation.model";
 
 interface ITableCreationAttr {
   restaurantId: number;
@@ -59,4 +61,7 @@ export class Tables extends Model<Tables, ITableCreationAttr> {
   })
   @BelongsTo(() => Restaurant)
   restaurant: Restaurant;
+
+  @HasMany(() => Reservation)
+  reservation: Reservation[];
 }

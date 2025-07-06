@@ -14,6 +14,11 @@ import { Tables } from "../../tables/models/table.model";
 import { MenuCategory } from "../../menu-categories/models/menu-category.model";
 import { RestaurantImage } from "../../restaurant-images/models/restaurant-image.model";
 import { Review } from "../../reviews/models/review.model";
+import { Reservation } from "../../reservation/models/reservation.model";
+import { Favorite } from "../../favorites/models/favorite.model";
+import { Announcement } from "../../announcements/models/announcement.model";
+import { Payment } from "../../payments/models/payment.model";
+import { OpeningSchedule } from "../../opening-schedules/models/opening-schedule.model";
 
 interface IRestaurantCreationAttr {
   name: string;
@@ -103,4 +108,19 @@ export class Restaurant extends Model<Restaurant, IRestaurantCreationAttr> {
 
   @HasMany(() => Review)
   review: Review[];
+
+  @HasMany(() => Reservation)
+  reservation: Reservation[];
+
+  @HasMany(() => Favorite)
+  favorite: Favorite[];
+
+  @HasMany(() => Announcement)
+  announcment: Announcement[];
+
+  @HasMany(() => Payment)
+  payment: Payment[];
+
+  @HasMany(() => OpeningSchedule)
+  openingSchedules: OpeningSchedule[];
 }
