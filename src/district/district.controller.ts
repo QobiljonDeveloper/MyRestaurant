@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
   ParseIntPipe,
 } from "@nestjs/common";
 import { DistrictService } from "./district.service";
@@ -13,59 +14,63 @@ import { CreateDistrictDto } from "./dto/create-district.dto";
 import { UpdateDistrictDto } from "./dto/update-district.dto";
 import { ApiTags, ApiOperation, ApiResponse } from "@nestjs/swagger";
 import { District } from "./models/district.model";
+import { AuthGuard } from "../common/guards/auth.guard";
+import { RolesGuard } from "../common/guards/role.guard";
+import { Roles } from "../common/decorators/roles.decorator";
 
 @ApiTags("Districts")
 @Controller("district")
 export class DistrictController {
-  constructor(private readonly districtService: DistrictService) {}
+  constructor(private readonly svc: DistrictService) {}
 
-  @ApiOperation({ summary: "Yangi tuman yaratish" })
-  @ApiResponse({ status: 201, description: "Tuman yaratildi", type: District })
-  @ApiResponse({
-    status: 409,
-    description: "Bu nomdagi tuman ushbu regionda mavjud",
-  })
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles("admin")
   @Post()
-  create(@Body() createDistrictDto: CreateDistrictDto) {
-    return this.districtService.create(createDistrictDto);
+  @ApiOperation({ summary: "Yangi tuman yaratish" })
+  @ApiResponse({ status: 201, type: District })
+  create(@Body() dto: CreateDistrictDto) {
+    return this.svc.create(dto);
   }
 
-  @ApiOperation({ summary: "Barcha tumanlarni olish" })
-  @ApiResponse({
-    status: 200,
-    description: "Tumanlar ro‘yxati",
-    type: [District],
-  })
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles("admin")
   @Get()
+  @ApiOperation({ summary: "Barcha tumanlarni olish" })
+  @ApiResponse({ status: 200, type: [District] })
   findAll() {
-    return this.districtService.findAll();
+    return this.svc.findAll();
   }
 
-  @ApiOperation({ summary: "ID orqali tuman olish" })
-  @ApiResponse({ status: 200, description: "Tuman topildi", type: District })
-  @ApiResponse({ status: 404, description: "Tuman topilmadi" })
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles("admin")
   @Get(":id")
+  @ApiOperation({ summary: "ID orqali tumanni olish" })
+  @ApiResponse({ status: 200, type: District })
+  @ApiResponse({ status: 404, description: "Topilmadi" })
   findOne(@Param("id", ParseIntPipe) id: number) {
-    return this.districtService.findOne(id);
+    return this.svc.findOne(id);
   }
 
-  @ApiOperation({ summary: "Tuman maʼlumotlarini yangilash" })
-  @ApiResponse({ status: 200, description: "Tuman yangilandi", type: District })
-  @ApiResponse({ status: 404, description: "Tuman topilmadi" })
-  @ApiResponse({ status: 409, description: "Takroriy nom" })
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles("admin")
   @Patch(":id")
+  @ApiOperation({ summary: "Tumanni yangilash" })
+  @ApiResponse({ status: 200, type: District })
+  @ApiResponse({ status: 404, description: "Topilmadi" })
   update(
     @Param("id", ParseIntPipe) id: number,
-    @Body() updateDistrictDto: UpdateDistrictDto
+    @Body() dto: UpdateDistrictDto
   ) {
-    return this.districtService.update(id, updateDistrictDto);
+    return this.svc.update(id, dto);
   }
 
-  @ApiOperation({ summary: "Tumanni o‘chirish" })
-  @ApiResponse({ status: 200, description: "Tuman o‘chirildi" })
-  @ApiResponse({ status: 404, description: "Tuman topilmadi" })
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles("admin")
   @Delete(":id")
+  @ApiOperation({ summary: "Tumanni o‘chirish" })
+  @ApiResponse({ status: 200, description: "O‘chirildi" })
+  @ApiResponse({ status: 404, description: "Topilmadi" })
   remove(@Param("id", ParseIntPipe) id: number) {
-    return this.districtService.remove(id);
+    return this.svc.remove(id);
   }
 }

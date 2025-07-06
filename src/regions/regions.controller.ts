@@ -6,67 +6,65 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
   ParseIntPipe,
 } from "@nestjs/common";
 import { RegionsService } from "./regions.service";
 import { CreateRegionDto } from "./dto/create-region.dto";
 import { UpdateRegionDto } from "./dto/update-region.dto";
-import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { ApiTags, ApiOperation, ApiResponse } from "@nestjs/swagger";
 import { Region } from "./models/region.models";
+import { AuthGuard } from "../common/guards/auth.guard";
+import { RolesGuard } from "../common/guards/role.guard";
+import { Roles } from "../common/decorators/roles.decorator";
 
 @ApiTags("Regions")
 @Controller("regions")
 export class RegionsController {
-  constructor(private readonly regionsService: RegionsService) {}
+  constructor(private readonly svc: RegionsService) {}
 
-  @ApiOperation({ summary: "Yangi region yaratish" })
-  @ApiResponse({ status: 201, description: "Region yaratildi", type: Region })
-  @ApiResponse({ status: 409, description: "Bu region nomi allaqachon mavjud" })
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles("admin")
   @Post()
-  create(@Body() createRegionDto: CreateRegionDto) {
-    return this.regionsService.create(createRegionDto);
+  @ApiOperation({ summary: "Yangi region yaratish" })
+  @ApiResponse({ status: 201, type: Region })
+  create(@Body() dto: CreateRegionDto) {
+    return this.svc.create(dto);
   }
 
-  @ApiOperation({ summary: "Barcha regionlarni olish" })
-  @ApiResponse({
-    status: 200,
-    description: "Regionlar ro‘yxati",
-    type: [Region],
-  })
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles("admin")
   @Get()
+  @ApiOperation({ summary: "Barcha regionlar" })
+  @ApiResponse({ status: 200, type: [Region] })
   findAll() {
-    return this.regionsService.findAll();
+    return this.svc.findAll();
   }
 
-  @ApiOperation({ summary: "ID orqali bitta regionni olish" })
-  @ApiResponse({
-    status: 200,
-    description: "Region topildi",
-    type: Region,
-  })
-  @ApiResponse({ status: 404, description: "Region topilmadi" })
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles("admin")
   @Get(":id")
+  @ApiOperation({ summary: "ID bo‘yicha region" })
+  @ApiResponse({ status: 200, type: Region })
+  @ApiResponse({ status: 404, description: "Topilmadi" })
   findOne(@Param("id", ParseIntPipe) id: number) {
-    return this.regionsService.findOne(id);
+    return this.svc.findOne(id);
   }
 
-  @ApiOperation({ summary: "Regionni yangilash" })
-  @ApiResponse({ status: 200, description: "Region yangilandi", type: Region })
-  @ApiResponse({ status: 404, description: "Region topilmadi" })
-  @ApiResponse({ status: 409, description: "Nom takrorlangan" })
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles("admin")
   @Patch(":id")
-  update(
-    @Param("id", ParseIntPipe) id: number,
-    @Body() updateRegionDto: UpdateRegionDto
-  ) {
-    return this.regionsService.update(id, updateRegionDto);
+  @ApiOperation({ summary: "Regionni yangilash" })
+  @ApiResponse({ status: 200, type: Region })
+  update(@Param("id", ParseIntPipe) id: number, @Body() dto: UpdateRegionDto) {
+    return this.svc.update(id, dto);
   }
 
-  @ApiOperation({ summary: "Regionni o‘chirish" })
-  @ApiResponse({ status: 200, description: "Region o‘chirildi" })
-  @ApiResponse({ status: 404, description: "Region topilmadi" })
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles("admin")
   @Delete(":id")
+  @ApiOperation({ summary: "Regionni o‘chirish" })
   remove(@Param("id", ParseIntPipe) id: number) {
-    return this.regionsService.remove(id);
+    return this.svc.remove(id);
   }
 }

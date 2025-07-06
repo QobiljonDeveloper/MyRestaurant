@@ -5,9 +5,13 @@ import { SequelizeModule } from "@nestjs/sequelize";
 import { Favorite } from "./models/favorite.model";
 import { User } from "../users/models/user.model";
 import { Restaurant } from "../restaurants/models/restaurant.model";
+import { AuthModule } from "../auth/auth.module";
 
 @Module({
-  imports: [SequelizeModule.forFeature([Favorite, User, Restaurant])],
+  imports: [
+    SequelizeModule.forFeature([Favorite, User, Restaurant]),
+    AuthModule,
+  ],
   controllers: [FavoritesController],
   providers: [FavoritesService],
 })

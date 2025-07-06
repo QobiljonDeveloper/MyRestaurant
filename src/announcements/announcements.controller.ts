@@ -6,75 +6,63 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
 } from "@nestjs/common";
 import { AnnouncementsService } from "./announcements.service";
 import { CreateAnnouncementDto } from "./dto/create-announcement.dto";
 import { UpdateAnnouncementDto } from "./dto/update-announcement.dto";
-import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { ApiTags, ApiOperation, ApiResponse } from "@nestjs/swagger";
 import { Announcement } from "./models/announcement.model";
+import { AuthGuard } from "../common/guards/auth.guard";
+import { RolesGuard } from "../common/guards/role.guard";
+import { Roles } from "../common/decorators/roles.decorator";
 
 @ApiTags("Announcements")
 @Controller("announcements")
 export class AnnouncementsController {
-  constructor(private readonly announcementsService: AnnouncementsService) {}
+  constructor(private readonly svc: AnnouncementsService) {}
 
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles("admin")
   @Post()
   @ApiOperation({ summary: "Yangi eʼlon yaratish" })
-  @ApiResponse({
-    status: 201,
-    description: "Yangi eʼlon muvaffaqiyatli yaratildi",
-    type: Announcement,
-  })
-  create(@Body() createAnnouncementDto: CreateAnnouncementDto) {
-    return this.announcementsService.create(createAnnouncementDto);
+  @ApiResponse({ status: 201, description: "Yaratildi", type: Announcement })
+  create(@Body() dto: CreateAnnouncementDto) {
+    return this.svc.create(dto);
   }
 
   @Get()
   @ApiOperation({ summary: "Barcha eʼlonlarni olish" })
-  @ApiResponse({
-    status: 200,
-    description: "Barcha eʼlonlar ro‘yxati",
-    type: [Announcement],
-  })
+  @ApiResponse({ status: 200, type: [Announcement] })
   findAll() {
-    return this.announcementsService.findAll();
+    return this.svc.findAll();
   }
 
   @Get(":id")
-  @ApiOperation({ summary: "Eʼlonni ID orqali olish" })
-  @ApiResponse({
-    status: 200,
-    description: "Topilgan eʼlon",
-    type: Announcement,
-  })
-  @ApiResponse({ status: 404, description: "Eʼlon topilmadi" })
+  @ApiOperation({ summary: "Eʼlonni ID bo‘yicha olish" })
+  @ApiResponse({ status: 200, type: Announcement })
+  @ApiResponse({ status: 404, description: "Topilmadi" })
   findOne(@Param("id") id: string) {
-    return this.announcementsService.findOne(+id);
+    return this.svc.findOne(+id);
   }
 
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles("admin")
   @Patch(":id")
   @ApiOperation({ summary: "Eʼlonni yangilash" })
-  @ApiResponse({
-    status: 200,
-    description: "Eʼlon muvaffaqiyatli yangilandi",
-    type: Announcement,
-  })
-  @ApiResponse({ status: 404, description: "Eʼlon topilmadi" })
-  update(
-    @Param("id") id: string,
-    @Body() updateAnnouncementDto: UpdateAnnouncementDto
-  ) {
-    return this.announcementsService.update(+id, updateAnnouncementDto);
+  @ApiResponse({ status: 200, type: Announcement })
+  @ApiResponse({ status: 404, description: "Topilmadi" })
+  update(@Param("id") id: string, @Body() dto: UpdateAnnouncementDto) {
+    return this.svc.update(+id, dto);
   }
 
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles("admin")
   @Delete(":id")
   @ApiOperation({ summary: "Eʼlonni o‘chirish" })
-  @ApiResponse({
-    status: 200,
-    description: "Eʼlon muvaffaqiyatli o‘chirildi",
-  })
-  @ApiResponse({ status: 404, description: "Eʼlon topilmadi" })
+  @ApiResponse({ status: 200, description: "O‘chirildi" })
+  @ApiResponse({ status: 404, description: "Topilmadi" })
   remove(@Param("id") id: string) {
-    return this.announcementsService.remove(+id);
+    return this.svc.remove(+id);
   }
 }

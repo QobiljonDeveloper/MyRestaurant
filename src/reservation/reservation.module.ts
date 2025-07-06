@@ -6,6 +6,7 @@ import { User } from "../users/models/user.model";
 import { Restaurant } from "../restaurants/models/restaurant.model";
 import { Tables as RestaurantTable } from "../tables/models/table.model";
 import { Reservation } from "./models/reservation.model";
+import { AuthModule } from "../auth/auth.module";
 @Module({
   imports: [
     SequelizeModule.forFeature([
@@ -14,6 +15,8 @@ import { Reservation } from "./models/reservation.model";
       Restaurant,
       RestaurantTable,
     ]),
+    AuthModule,
+
   ],
   controllers: [ReservationController],
   providers: [ReservationService],

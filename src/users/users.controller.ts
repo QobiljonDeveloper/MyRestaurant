@@ -6,72 +6,55 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
+  Request,
 } from "@nestjs/common";
 import { UsersService } from "./users.service";
-import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
-import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { ApiTags, ApiOperation, ApiResponse } from "@nestjs/swagger";
 import { User } from "./models/user.model";
+import { AuthGuard } from "../common/guards/auth.guard";
+import { Roles } from "../common/decorators/roles.decorator";
+import { RolesGuard } from "../common/guards/role.guard";
+import { SelfGuard } from "../common/guards/self.guard";
 
-@ApiTags("Foydalanuvchilar")
+@ApiTags("Users")
 @Controller("users")
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Post()
-  @ApiOperation({ summary: "Yangi foydalanuvchi yaratish" })
-  @ApiResponse({
-    status: 201,
-    description: "Foydalanuvchi muvaffaqiyatli yaratildi",
-    type: User,
-  })
-  @ApiResponse({ status: 400, description: "Foydalanuvchi allaqachon mavjud" })
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
-  }
-
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles("admin")
   @Get()
-  @ApiOperation({ summary: "Barcha foydalanuvchilarni olish" })
-  @ApiResponse({
-    status: 200,
-    description: "Foydalanuvchilar ro‘yxati",
-    type: [User],
-  })
+  @ApiOperation({ summary: "Barcha foydalanuvchilar (admin only)" })
+  @ApiResponse({ status: 200, type: [User] })
   findAll() {
     return this.usersService.findAll();
   }
 
+  @UseGuards(AuthGuard, SelfGuard)
   @Get(":id")
-  @ApiOperation({ summary: "ID bo‘yicha foydalanuvchini olish" })
-  @ApiResponse({
-    status: 200,
-    description: "Topilgan foydalanuvchi",
-    type: User,
+  @ApiOperation({
+    summary: "Foydalanuvchini ID orqali ko‘rish (o‘zi yoki admin)",
   })
-  @ApiResponse({ status: 404, description: "Foydalanuvchi topilmadi" })
+  @ApiResponse({ status: 200, type: User })
   findOne(@Param("id") id: string) {
     return this.usersService.findOne(+id);
   }
 
+  @UseGuards(AuthGuard, SelfGuard)
   @Patch(":id")
-  @ApiOperation({ summary: "Foydalanuvchini yangilash" })
-  @ApiResponse({
-    status: 200,
-    description: "Foydalanuvchi muvaffaqiyatli yangilandi",
-    type: User,
-  })
-  @ApiResponse({ status: 404, description: "Foydalanuvchi topilmadi" })
+  @ApiOperation({ summary: "Foydalanuvchini yangilash (o‘zi yoki admin)" })
+  @ApiResponse({ status: 200, type: User })
   update(@Param("id") id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(+id, updateUserDto);
   }
 
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles("admin")
   @Delete(":id")
-  @ApiOperation({ summary: "Foydalanuvchini o‘chirish" })
-  @ApiResponse({
-    status: 200,
-    description: "Foydalanuvchi muvaffaqiyatli o‘chirildi",
-  })
-  @ApiResponse({ status: 404, description: "Foydalanuvchi topilmadi" })
+  @ApiOperation({ summary: "Foydalanuvchini o‘chirish (admin only)" })
+  @ApiResponse({ status: 200, description: "O‘chirildi" })
   remove(@Param("id") id: string) {
     return this.usersService.remove(+id);
   }

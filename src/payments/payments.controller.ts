@@ -6,69 +6,64 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
 } from "@nestjs/common";
 import { PaymentsService } from "./payments.service";
 import { CreatePaymentDto } from "./dto/create-payment.dto";
 import { UpdatePaymentDto } from "./dto/update-payment.dto";
-import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { ApiTags, ApiOperation, ApiResponse } from "@nestjs/swagger";
 import { Payment } from "./models/payment.model";
+import { AuthGuard } from "../common/guards/auth.guard";
+import { RolesGuard } from "../common/guards/role.guard";
+import { Roles } from "../common/decorators/roles.decorator";
 
 @ApiTags("Payments")
 @Controller("payments")
 export class PaymentsController {
-  constructor(private readonly paymentsService: PaymentsService) {}
+  constructor(private readonly svc: PaymentsService) {}
 
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles("admin")
   @Post()
   @ApiOperation({ summary: "Yangi to‘lov yaratish" })
-  @ApiResponse({
-    status: 201,
-    description: "To‘lov muvaffaqiyatli yaratildi",
-    type: Payment,
-  })
-  create(@Body() createPaymentDto: CreatePaymentDto) {
-    return this.paymentsService.create(createPaymentDto);
+  @ApiResponse({ status: 201, type: Payment })
+  create(@Body() dto: CreatePaymentDto) {
+    return this.svc.create(dto);
   }
 
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles("admin")
   @Get()
-  @ApiOperation({ summary: "Barcha to‘lovlarni olish" })
-  @ApiResponse({
-    status: 200,
-    description: "Barcha to‘lovlar ro‘yxati",
-    type: [Payment],
-  })
+  @ApiOperation({ summary: "Barcha to‘lovlar" })
+  @ApiResponse({ status: 200, type: [Payment] })
   findAll() {
-    return this.paymentsService.findAll();
+    return this.svc.findAll();
   }
 
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles("admin")
   @Get(":id")
-  @ApiOperation({ summary: "To‘lovni ID orqali olish" })
-  @ApiResponse({
-    status: 200,
-    description: "Topilgan to‘lov",
-    type: Payment,
-  })
-  @ApiResponse({ status: 404, description: "To‘lov topilmadi" })
+  @ApiOperation({ summary: "ID bo‘yicha to‘lov" })
+  @ApiResponse({ status: 200, type: Payment })
+  @ApiResponse({ status: 404, description: "Topilmadi" })
   findOne(@Param("id") id: string) {
-    return this.paymentsService.findOne(+id);
+    return this.svc.findOne(+id);
   }
 
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles("admin")
   @Patch(":id")
-  @ApiOperation({ summary: "To‘lov maʼlumotlarini yangilash" })
-  @ApiResponse({
-    status: 200,
-    description: "To‘lov muvaffaqiyatli yangilandi",
-    type: Payment,
-  })
-  @ApiResponse({ status: 404, description: "To‘lov topilmadi" })
-  update(@Param("id") id: string, @Body() updatePaymentDto: UpdatePaymentDto) {
-    return this.paymentsService.update(+id, updatePaymentDto);
+  @ApiOperation({ summary: "To‘lovni yangilash" })
+  @ApiResponse({ status: 200, type: Payment })
+  update(@Param("id") id: string, @Body() dto: UpdatePaymentDto) {
+    return this.svc.update(+id, dto);
   }
 
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles("admin")
   @Delete(":id")
   @ApiOperation({ summary: "To‘lovni o‘chirish" })
-  @ApiResponse({ status: 200, description: "To‘lov muvaffaqiyatli o‘chirildi" })
-  @ApiResponse({ status: 404, description: "To‘lov topilmadi" })
   remove(@Param("id") id: string) {
-    return this.paymentsService.remove(+id);
+    return this.svc.remove(+id);
   }
 }

@@ -5,9 +5,10 @@ import { SequelizeModule } from "@nestjs/sequelize";
 import { Review } from "./models/review.model";
 import { Restaurant } from "../restaurants/models/restaurant.model";
 import { User } from "../users/models/user.model";
+import { AuthModule } from "../auth/auth.module";
 
 @Module({
-  imports: [SequelizeModule.forFeature([Review, Restaurant, User])],
+  imports: [SequelizeModule.forFeature([Review, Restaurant, User]), AuthModule],
   controllers: [ReviewsController],
   providers: [ReviewsService],
 })
