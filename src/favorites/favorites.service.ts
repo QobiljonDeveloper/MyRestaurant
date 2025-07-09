@@ -33,17 +33,37 @@ export class FavoritesService {
 
   async findAll() {
     return this.favoriteModel.findAll({
-      include: [User, Restaurant],
+      include: [
+        {
+          model: User,
+          attributes: ["name"],
+        },
+        {
+          model: Restaurant,
+          attributes: ["name", "description"],
+        },
+      ],
     });
   }
 
   async findOne(id: number) {
     const favorite = await this.favoriteModel.findByPk(id, {
-      include: [User, Restaurant],
+      include: [
+        {
+          model: User,
+          attributes: ["name"],
+        },
+        {
+          model: Restaurant,
+          attributes: ["name", "description"],
+        },
+      ],
     });
+
     if (!favorite) {
       throw new NotFoundException(`Sevimli topilmadi: ID ${id}`);
     }
+
     return favorite;
   }
 

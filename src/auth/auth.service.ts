@@ -52,7 +52,6 @@ export class AuthService {
       throw new BadRequestException("Parollar mos emas");
     }
 
-    // ROLE ADMIN BO'LSA RO'YXATDAN O'TISHNI TAQIQLASH
     if (dto.role && dto.role.toLowerCase() === "admin") {
       throw new ForbiddenException("Admin sifatida ro'yxatdan o'tib bo'lmaydi");
     }
@@ -69,7 +68,6 @@ export class AuthService {
       ...dto,
       password: hash,
       activation_link,
-      role: UserRole.CUSTOMER,
     });
 
     await this.mailService.sendMail(user);
@@ -152,7 +150,19 @@ export class AuthService {
       return { message: "Akkount allaqachon faollashtirilgan" };
     }
 
+    if (user.role === UserRole.MANAGER) {
+      // Faqat email tasdiqlanadi, lekin active bo'lmaydi
+      user.email_confirmed = true;
+      await user.save();
+
+      return {
+        message:
+          "Email tasdiqlandi. Admin tomonidan tasdiqlangach hisobingiz faollashadi.",
+      };
+    }
+
     user.is_active = true;
+    user.email_confirmed = true;
     await user.save();
 
     return { message: "Akkount muvaffaqiyatli faollashtirildi" };

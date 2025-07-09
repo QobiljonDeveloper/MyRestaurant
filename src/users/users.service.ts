@@ -8,6 +8,12 @@ import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
 import { User, UserRole } from "./models/user.model";
 import { Op } from "sequelize";
+import { Payment } from "../payments/models/payment.model";
+import { Favorite } from "../favorites/models/favorite.model";
+import { Reservation } from "../reservation/models/reservation.model";
+import { Review } from "../reviews/models/review.model";
+import { Restaurant } from "../restaurants/models/restaurant.model";
+import { Tables } from "../tables/models/table.model";
 
 @Injectable()
 export class UsersService {
@@ -51,11 +57,141 @@ export class UsersService {
   }
 
   async findAll(): Promise<User[]> {
-    return this.userModel.findAll({ include: { all: true } });
+    return this.userModel.findAll({
+      attributes: ["name", "email", "role", "phone"],
+      include: [
+        {
+          model: Restaurant,
+          attributes: ["id", "name", "location"],
+          include: [
+            {
+              association: "district",
+              attributes: ["id", "name"],
+            },
+            {
+              association: "user",
+              attributes: ["id", "name", "email"],
+            },
+          ],
+        },
+        {
+          model: Review,
+          attributes: ["id", "comment", "rating"],
+        },
+        {
+          model: Reservation,
+          attributes: ["id", "guestCount", "time", "status"],
+          include: [
+            {
+              model: Tables,
+              attributes: ["id", "tableNumber", "price"],
+            },
+            {
+              model: Restaurant,
+              attributes: ["id", "name", "location"],
+            },
+            {
+              model: User,
+              attributes: ["id", "name", "email"],
+            },
+          ],
+        },
+
+        {
+          model: Favorite,
+          attributes: ["id"],
+          include: [
+            {
+              association: "restaurant",
+              attributes: ["id", "name"],
+            },
+          ],
+        },
+        {
+          model: Payment,
+          attributes: ["id", "amount", "method", "status"],
+          include: [
+            {
+              association: "restaurant",
+              attributes: ["id", "name"],
+            },
+            {
+              association: "reservation",
+              attributes: ["id", "time"],
+            },
+          ],
+        },
+      ],
+    });
   }
 
   async findOne(id: number): Promise<User> {
-    const user = await this.userModel.findByPk(id, { include: { all: true } });
+    const user = await this.userModel.findByPk(id, {
+      attributes: ["name", "email", "role", "phone"],
+      include: [
+        {
+          model: Restaurant,
+          attributes: ["id", "name", "location"],
+          include: [
+            {
+              association: "district",
+              attributes: ["id", "name"],
+            },
+            {
+              association: "user",
+              attributes: ["id", "name", "email"],
+            },
+          ],
+        },
+        {
+          model: Review,
+          attributes: ["id", "comment", "rating"],
+        },
+        {
+          model: Reservation,
+          attributes: ["id", "guestCount", "time", "status"],
+          include: [
+            {
+              model: Tables,
+              attributes: ["id", "tableNumber", "price"],
+            },
+            {
+              model: Restaurant,
+              attributes: ["id", "name", "location"],
+            },
+            {
+              model: User,
+              attributes: ["id", "name", "email"],
+            },
+          ],
+        },
+
+        {
+          model: Favorite,
+          attributes: ["id"],
+          include: [
+            {
+              association: "restaurant",
+              attributes: ["id", "name"],
+            },
+          ],
+        },
+        {
+          model: Payment,
+          attributes: ["id", "amount", "method", "status"],
+          include: [
+            {
+              association: "restaurant",
+              attributes: ["id", "name"],
+            },
+            {
+              association: "reservation",
+              attributes: ["id", "time"],
+            },
+          ],
+        },
+      ],
+    });
     if (!user) {
       throw new NotFoundException("Foydalanuvchi topilmadi");
     }
@@ -92,5 +228,31 @@ export class UsersService {
     return this.userModel.findOne({
       where: { activation_link: link },
     });
+  }
+
+  async getPendingManagers(): Promise<User[]> {
+    return this.userModel.findAll({
+      where: {
+        role: UserRole.MANAGER,
+        is_active: false,
+        email_confirmed: true,
+      },
+    });
+  }
+  async approveManager(id: number): Promise<{ message: string }> {
+    const user = await this.findOne(id);
+
+    if (user.role !== UserRole.MANAGER) {
+      throw new BadRequestException("Faqat managerlarni tasdiqlash mumkin");
+    }
+
+    if (!user.email_confirmed) {
+      throw new BadRequestException("Manager hali emailni tasdiqlamagan");
+    }
+
+    user.is_active = true;
+    await user.save();
+
+    return { message: "Manager akkaunti faollashtirildi" };
   }
 }

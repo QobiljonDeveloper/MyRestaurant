@@ -38,6 +38,13 @@ export class UsersController {
     return this.usersService.findAll();
   }
 
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles("admin")
+  @Get("managers/pending")
+  getPendingManagers() {
+    return this.usersService.getPendingManagers();
+  }
+
   @UseGuards(AuthGuard, SelfGuard)
   @Get(":id")
   @ApiOperation({
@@ -68,5 +75,12 @@ export class UsersController {
   @UseGuards(AuthGuard, IsCreatorGuard)
   createAdmin(@Body() dto: CreateUserDto) {
     return this.usersService.createAdmin(dto);
+  }
+
+  @UseGuards(AuthGuard, RolesGuard)
+  @Roles("admin")
+  @Patch("managers/:id/approve")
+  approveManager(@Param("id") id: number) {
+    return this.usersService.approveManager(id);
   }
 }

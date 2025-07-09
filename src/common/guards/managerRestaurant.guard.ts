@@ -26,7 +26,7 @@ export class ManagerRestaurantGuard implements CanActivate {
     const restaurantId =
       request.body?.restaurantId ||
       request.params?.restaurantId ||
-      request.params?.id || // Fallback
+      request.params?.id ||
       null;
 
     if (!restaurantId) {

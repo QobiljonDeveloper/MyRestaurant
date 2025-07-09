@@ -43,14 +43,50 @@ export class MenuService {
   }
 
   async findAll() {
-    return this.menuModel.findAll({ include: { all: true } });
+    return this.menuModel.findAll({
+      include: [
+        {
+          association: "restaurant",
+          attributes: ["name"],
+        },
+        {
+          association: "menuCategory",
+          attributes: ["name", "imageUrl"],
+          include: [
+            {
+              association: "restaurant",
+              attributes: ["name"],
+            },
+          ],
+        },
+      ],
+    });
   }
 
   async findOne(id: number) {
-    const menu = await this.menuModel.findByPk(id, { include: { all: true } });
+    const menu = await this.menuModel.findByPk(id, {
+      include: [
+        {
+          association: "restaurant",
+          attributes: ["name"],
+        },
+        {
+          association: "menuCategory",
+          attributes: ["name", "imageUrl"],
+          include: [
+            {
+              association: "restaurant",
+              attributes: ["name"],
+            },
+          ],
+        },
+      ],
+    });
+
     if (!menu) {
       throw new NotFoundException(`ID ${id} bo‘lgan taom topilmadi`);
     }
+
     return menu;
   }
 

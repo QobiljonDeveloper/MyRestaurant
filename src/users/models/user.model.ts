@@ -69,6 +69,10 @@ export class User extends Model<User, IUserCreationAttr> {
   })
   declare password: string;
 
+  @ApiProperty({ example: false, required: false })
+  @Column({ type: DataType.BOOLEAN, defaultValue: false })
+  declare email_confirmed: boolean;
+
   @ApiProperty({
     example: "+998901234567",
     description: "Foydalanuvchining telefon raqami",

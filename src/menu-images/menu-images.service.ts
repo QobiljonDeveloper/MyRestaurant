@@ -22,12 +22,24 @@ export class MenuImagesService {
   }
 
   async findAll() {
-    return this.menuImageRepo.findAll({ include: { all: true } });
+    return this.menuImageRepo.findAll({
+      include: [
+        {
+          association: "menu",
+          attributes: ["name"],
+        },
+      ],
+    });
   }
 
   async findOne(id: number) {
     const image = await this.menuImageRepo.findByPk(id, {
-      include: { all: true },
+      include: [
+        {
+          association: "menu",
+          attributes: ["name"],
+        },
+      ],
     });
     if (!image) throw new NotFoundException("Menu rasm topilmadi");
     return image;

@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   UseGuards,
+  ParseIntPipe,
 } from "@nestjs/common";
 import { ReservationService } from "./reservation.service";
 import { CreateReservationDto } from "./dto/create-reservation.dto";
@@ -22,6 +23,13 @@ import { SelfGuard } from "../common/guards/self.guard";
 @Controller("reservation")
 export class ReservationController {
   constructor(private readonly reservationService: ReservationService) {}
+
+  @UseGuards(AuthGuard)
+  @Get("today")
+  getTodayReservations() {
+    return this.reservationService.getTodayReservations();
+  }
+
   @UseGuards(AuthGuard)
   @Post()
   @ApiOperation({ summary: "Yangi bandlov yaratish" })
@@ -37,6 +45,7 @@ export class ReservationController {
   create(@Body() createReservationDto: CreateReservationDto) {
     return this.reservationService.create(createReservationDto);
   }
+
   @UseGuards(AuthGuard, RolesGuard)
   @Roles("admin")
   @Get()
@@ -49,6 +58,7 @@ export class ReservationController {
   findAll() {
     return this.reservationService.findAll();
   }
+
   @UseGuards(AuthGuard, SelfGuard)
   @Get(":id")
   @ApiOperation({ summary: "Bitta bandlovni ko‘rish" })
@@ -58,9 +68,10 @@ export class ReservationController {
     type: Reservation,
   })
   @ApiResponse({ status: 404, description: "Bandlov topilmadi" })
-  findOne(@Param("id") id: string) {
-    return this.reservationService.findOne(+id);
+  findOne(@Param("id", ParseIntPipe) id: number) {
+    return this.reservationService.findOne(id);
   }
+
   @UseGuards(AuthGuard, SelfGuard)
   @Patch(":id")
   @ApiOperation({ summary: "Bandlov maʼlumotlarini yangilash" })
@@ -71,11 +82,12 @@ export class ReservationController {
   })
   @ApiResponse({ status: 404, description: "Bandlov topilmadi" })
   update(
-    @Param("id") id: string,
+    @Param("id", ParseIntPipe) id: number,
     @Body() updateReservationDto: UpdateReservationDto
   ) {
-    return this.reservationService.update(+id, updateReservationDto);
+    return this.reservationService.update(id, updateReservationDto);
   }
+
   @UseGuards(AuthGuard, SelfGuard)
   @Delete(":id")
   @ApiOperation({ summary: "Bandlovni o‘chirish" })
@@ -84,7 +96,7 @@ export class ReservationController {
     description: "Bandlov o‘chirildi",
   })
   @ApiResponse({ status: 404, description: "Bandlov topilmadi" })
-  remove(@Param("id") id: string) {
-    return this.reservationService.remove(+id);
+  remove(@Param("id", ParseIntPipe) id: number) {
+    return this.reservationService.remove(id);
   }
 }

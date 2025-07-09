@@ -40,16 +40,38 @@ export class MenuCategoriesService {
   }
 
   async findAll() {
-    return this.menuCategoryModel.findAll({ include: { all: true } });
+    return this.menuCategoryModel.findAll({
+      include: [
+        {
+          association: "restaurant",
+          attributes: ["name"],
+        },
+        {
+          association: "menu",
+          attributes: ["name"],
+        },
+      ],
+    });
   }
 
   async findOne(id: number) {
     const category = await this.menuCategoryModel.findByPk(id, {
-      include: { all: true },
+      include: [
+        {
+          association: "restaurant",
+          attributes: ["name"],
+        },
+        {
+          association: "menu",
+          attributes: ["name"],
+        },
+      ],
     });
+
     if (!category) {
       throw new NotFoundException("Kategoriya topilmadi");
     }
+
     return category;
   }
 

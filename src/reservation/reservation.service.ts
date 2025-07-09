@@ -11,6 +11,7 @@ import { Reservation } from "./models/reservation.model";
 import { User } from "../users/models/user.model";
 import { Tables as RestaurantTable } from "../tables/models/table.model";
 import { Restaurant } from "../restaurants/models/restaurant.model";
+import { Op } from "sequelize";
 
 @Injectable()
 export class ReservationService {
@@ -45,16 +46,70 @@ export class ReservationService {
     return reservation;
   }
 
+  getTodayReservations() {
+    const today = new Date();
+    const startOfDay = new Date(today.setHours(0, 0, 0, 0));
+    const endOfDay = new Date(today.setHours(23, 59, 59, 999));
+
+    return this.reservationModel.findAll({
+      where: {
+        createdAt: {
+          [Op.between]: [startOfDay, endOfDay],
+        },
+      },
+      include: [User, Restaurant, RestaurantTable],
+    });
+  }
+
   async findAll() {
     return this.reservationModel.findAll({
-      include: [User, Restaurant, RestaurantTable],
+      include: [
+        {
+          model: User,
+          attributes: ["id", "name"],
+        },
+        {
+          model: Restaurant,
+          attributes: ["id", "name"],
+        },
+        {
+          model: RestaurantTable,
+          attributes: { exclude: [] },
+          include: [
+            {
+              model: Restaurant,
+              attributes: ["id", "name", "location"],
+            },
+          ],
+        },
+      ],
     });
   }
 
   async findOne(id: number) {
     const reservation = await this.reservationModel.findByPk(id, {
-      include: [User, Restaurant, RestaurantTable],
+      include: [
+        {
+          model: User,
+          attributes: ["id", "name"],
+        },
+        {
+          model: Restaurant,
+          attributes: ["id", "name"],
+        },
+        {
+          model: RestaurantTable,
+          attributes: { exclude: [] },
+          include: [
+            {
+              model: Restaurant,
+              attributes: ["id", "name", "location"],
+            },
+          ],
+        },
+      ],
     });
+
     if (!reservation) {
       throw new NotFoundException(`Bandlov topilmadi: ID ${id}`);
     }

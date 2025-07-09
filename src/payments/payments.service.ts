@@ -6,6 +6,7 @@ import { Payment } from "./models/payment.model";
 import { User } from "../users/models/user.model";
 import { Restaurant } from "../restaurants/models/restaurant.model";
 import { Reservation } from "../reservation/models/reservation.model";
+import { Tables } from "../tables/models/table.model";
 
 @Injectable()
 export class PaymentsService {
@@ -44,13 +45,67 @@ export class PaymentsService {
 
   async findAll() {
     return this.paymentModel.findAll({
-      include: [User, Restaurant, Reservation],
+      include: [
+        {
+          model: User,
+          attributes: ["name", "phone"],
+        },
+        {
+          model: Restaurant,
+          attributes: ["name"],
+        },
+        {
+          model: Reservation,
+          attributes: ["id"],
+          include: [
+            {
+              model: Tables,
+              attributes: ["tableNumber"],
+            },
+            {
+              model: User,
+              attributes: ["name"],
+            },
+            {
+              model: Restaurant,
+              attributes: ["name", "location"],
+            },
+          ],
+        },
+      ],
     });
   }
 
   async findOne(id: number) {
     const payment = await this.paymentModel.findByPk(id, {
-      include: [User, Restaurant, Reservation],
+      include: [
+        {
+          model: User,
+          attributes: ["name", "phone"],
+        },
+        {
+          model: Restaurant,
+          attributes: ["name"],
+        },
+        {
+          model: Reservation,
+          attributes: ["id"],
+          include: [
+            {
+              model: Tables,
+              attributes: ["tableNumber"],
+            },
+            {
+              model: User,
+              attributes: ["name"],
+            },
+            {
+              model: Restaurant,
+              attributes: ["name", "location"],
+            },
+          ],
+        },
+      ],
     });
     if (!payment) throw new NotFoundException(`Toʻlov topilmadi: ID ${id}`);
     return payment;

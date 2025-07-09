@@ -7,6 +7,7 @@ import { InjectModel } from "@nestjs/sequelize";
 import { District } from "./models/district.model";
 import { CreateDistrictDto } from "./dto/create-district.dto";
 import { UpdateDistrictDto } from "./dto/update-district.dto";
+import { Region } from "../regions/models/region.models";
 
 @Injectable()
 export class DistrictService {
@@ -32,18 +33,32 @@ export class DistrictService {
 
   async findAll() {
     const districts = await this.districtRepo.findAll({
-      include: { all: true },
+      attributes: ["id", "name", "regionId"],
+      include: [
+        {
+          model: Region,
+          attributes: ["id", "name"],
+        },
+      ],
     });
     return { count: districts.length, data: districts };
   }
 
   async findOne(id: number) {
     const district = await this.districtRepo.findByPk(id, {
-      include: { all: true },
+      attributes: ["id", "name", "regionId"],
+      include: [
+        {
+          model: Region,
+          attributes: ["id", "name"],
+        },
+      ],
     });
+
     if (!district) {
       throw new NotFoundException("District topilmadi");
     }
+
     return district;
   }
 

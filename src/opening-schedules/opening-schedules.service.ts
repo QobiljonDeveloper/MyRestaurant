@@ -30,12 +30,30 @@ export class OpeningSchedulesService {
   }
 
   async findAll() {
-    return this.openingScheduleModel.findAll({ include: [Restaurant] });
+    return this.openingScheduleModel.findAll({
+      attributes: {
+        exclude: ["createdAt", "updatedAt"],
+      },
+      include: [
+        {
+          model: Restaurant,
+          attributes: ["name", "location"],
+        },
+      ],
+    });
   }
 
   async findOne(id: number) {
     const schedule = await this.openingScheduleModel.findByPk(id, {
-      include: [Restaurant],
+      attributes: {
+        exclude: ["createdAt", "updatedAt"],
+      },
+      include: [
+        {
+          model: Restaurant,
+          attributes: ["name", "location"],
+        },
+      ],
     });
     if (!schedule) {
       throw new NotFoundException(`Jadval topilmadi: ID ${id}`);
