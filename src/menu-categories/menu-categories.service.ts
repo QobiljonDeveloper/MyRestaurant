@@ -81,7 +81,6 @@ export class MenuCategoriesService {
       throw new NotFoundException("Kategoriya topilmadi");
     }
 
-    // Optional: nom takrorlanmasligi uchun tekshiruv
     if (dto.name && dto.restaurantId) {
       const exists = await this.menuCategoryModel.findOne({
         where: {

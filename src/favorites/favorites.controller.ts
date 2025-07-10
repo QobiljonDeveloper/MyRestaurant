@@ -31,7 +31,7 @@ export class FavoritesController {
   create(@Request() req, @Body() dto: CreateFavoriteDto) {
     return this.favoritesService.create({
       ...dto,
-      userId: req.user.id, // foydalanuvchining ID sini avtomatik olish
+      userId: req.user.id,
     });
   }
 

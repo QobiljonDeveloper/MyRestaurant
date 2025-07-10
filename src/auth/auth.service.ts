@@ -151,7 +151,6 @@ export class AuthService {
     }
 
     if (user.role === UserRole.MANAGER) {
-      // Faqat email tasdiqlanadi, lekin active bo'lmaydi
       user.email_confirmed = true;
       await user.save();
 

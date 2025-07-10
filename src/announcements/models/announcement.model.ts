@@ -13,7 +13,7 @@ interface IAnnouncementsCreationAttr {
   restaurantId: number;
   title: string;
   content: string;
-  imageUrl?: string; // optional qilindi
+  imageUrl?: string; 
   isActive: boolean;
 }
 
