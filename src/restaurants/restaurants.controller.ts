@@ -32,8 +32,7 @@ export class RestaurantsController {
     return this.svc.create(dto);
   }
 
-  @UseGuards(AuthGuard, RolesGuard)
-  @Roles("admin")
+  @UseGuards(AuthGuard)
   @Get()
   @ApiOperation({ summary: "Barcha restoranlar" })
   @ApiResponse({ status: 200, type: [Restaurant] })
@@ -41,8 +40,7 @@ export class RestaurantsController {
     return this.svc.findAll();
   }
 
-  @UseGuards(AuthGuard, RolesGuard)
-  @Roles("admin")
+  @UseGuards(AuthGuard)
   @Get(":id")
   @ApiOperation({ summary: "ID bo‘yicha restoran" })
   @ApiResponse({ status: 200, type: Restaurant })

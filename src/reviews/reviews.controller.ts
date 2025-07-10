@@ -40,7 +40,6 @@ export class ReviewsController {
   create(@Request() req, @Body() dto: CreateReviewDto) {
     return this.reviewsService.create({
       ...dto,
-      userId: req.user.id,
     });
   }
 

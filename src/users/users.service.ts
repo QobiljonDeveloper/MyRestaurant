@@ -127,7 +127,15 @@ export class UsersService {
 
   async findOne(id: number): Promise<User> {
     const user = await this.userModel.findByPk(id, {
-      attributes: ["name", "email", "role", "phone"],
+      attributes: [
+        "id",
+        "name",
+        "email",
+        "role",
+        "phone",
+        "email_confirmed",
+        "is_active",
+      ],
       include: [
         {
           model: Restaurant,
@@ -249,7 +257,6 @@ export class UsersService {
     if (!user.email_confirmed) {
       throw new BadRequestException("Manager hali emailni tasdiqlamagan");
     }
-
     user.is_active = true;
     await user.save();
 

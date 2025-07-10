@@ -31,6 +31,7 @@ export class ReservationController {
   }
 
   @UseGuards(AuthGuard)
+  
   @Post()
   @ApiOperation({ summary: "Yangi bandlov yaratish" })
   @ApiResponse({
